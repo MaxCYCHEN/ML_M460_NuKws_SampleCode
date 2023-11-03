@@ -54,7 +54,7 @@ public:
     int audioBlockSize;
     int audioBufferSize;
 		
-		
+		int16_t audio_buffer_16bit[640];
 
 protected:
     /** @brief Initialises the model */

@@ -80,7 +80,6 @@ void KWS::InitKws()
 
 void KWS::ExtractFeatures()
 {
-	//transfer from uint32 to int16
 	for(uint16_t i = 0; i < 8000; i++)
     {
         audio_buffer_16bit[2*i] = audioBuffer[i]&0x0000FFFF;

@@ -43,9 +43,6 @@ static uint32_t audio_io_buffer2[BUFF_LEN];	//32K
 static uint32_t audio_buffer[BUFF_LEN];
 
 static uint32_t*  ptraudio_buffer = 0;
-
-int16_t* AUDIO_BUFFER_IN;
-int16_t* AUDIO_BUFFER_OUT;
 volatile uint8_t u8Count=0;
 
 

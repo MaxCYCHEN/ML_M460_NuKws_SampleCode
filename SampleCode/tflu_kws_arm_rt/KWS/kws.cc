@@ -79,13 +79,12 @@ void KWS::InitKws()
 
 void KWS::ExtractFeatures()
 {
-	//transfer from uint32 to int16
-	int16_t audio_buffer_16bit[640];
-	for(int i = 0; i < 640; i++)
+		for(uint16_t i = 0; i < 320; i++)
     {
-        audio_buffer_16bit[i] = audioBuffer[i];
+        audio_buffer_16bit[2*i] = audioBuffer[i]&0x0000FFFF;
+			  audio_buffer_16bit[2*i+1] = (audioBuffer[i]>>16)&0x0000FFFF;
+			  
     }
-	
 	
     if (numFrames > recordingWin) {
         // Move old features left.

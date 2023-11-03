@@ -31,12 +31,9 @@ extern "C" {
 static DMA_DESC_T DMA_RXDESC[2];
 
 //PDMA1
-static uint32_t audio_io_buffer1[BUFF_LEN*2];	
+static uint32_t audio_io_buffer1[BUFF_LEN];
+static uint32_t audio_io_buffer2[BUFF_LEN];	
 static uint32_t audio_buffer[BUFF_LEN];	
-
-//int16_t* AUDIO_BUFFER_IN;
-//int16_t* AUDIO_BUFFER_OUT;
-
 
 //KWS
 KWS *kws;
@@ -46,6 +43,9 @@ static volatile uint8_t s_u8pdmaIRQReIn = 0;
 static volatile uint8_t s_u8TxIdx = 0, s_u8RxIdx = 0;
 static volatile uint8_t s_u8CopyData = 0;
 
+#ifdef  __cplusplus
+extern  "C" {
+#endif
 void PDMA0_IRQHandler(void);
 void SYS_Init(void);
 void PDMA_Init(void);
@@ -61,6 +61,9 @@ void NAU88L25_Reset(void);
 void NAU88L25_Setup(void);
 #endif
 
+#ifdef  __cplusplus
+}
+#endif	
 
 void PDMA0_IRQHandler(void)
 {
@@ -80,7 +83,7 @@ void PDMA0_IRQHandler(void)
 					  else if(PDMA0->CURSCAT[1] == (uint32_t)&DMA_RXDESC[1])
 					  {
                 for (int i=0;i<BUFF_LEN;i++) {
-									audio_buffer[i] = audio_io_buffer1[BUFF_LEN*1 + i*1];
+									audio_buffer[i] = audio_io_buffer2[i];;
                 }
 						}
         s_u8CopyData = 1;
@@ -88,9 +91,6 @@ void PDMA0_IRQHandler(void)
 						
         }
 		
-        if (PDMA_GET_TD_STS(PDMA0) & 0x4) {          /* channel 2 done */
-            PDMA_CLR_TD_FLAG(PDMA0, PDMA_TDSTS_TDIF2_Msk);
-        }
     }
 		else
 		{
@@ -164,22 +164,21 @@ void NAU8822_Setup(void)
 		//I2C_WriteNAU8822(7,  0x006);   /* 16K for internal filter coefficients */
 		//I2C_WriteNAU8822(6,  0x14D);   /* Divide by 2, 48K */
 		
-		//I2C_WriteNAU8822(6,  0x1AD);
-		//I2C_WriteNAU8822(7,  0x006);   /* 48K for internal filter coefficients */
+		I2C_WriteNAU8822(6,  0x1AD);
+		I2C_WriteNAU8822(7,  0x006);   /* 48K for internal filter coefficients */
 
-		I2C_WriteNAU8822(6,  0x001);   /* Divide by 1, FS and BCLK are driven as outputs, 16K */ // NAU8822 as Master
-    I2C_WriteNAU8822(7,  0x000);   /* 48K for internal filter coefficients */
+		//I2C_WriteNAU8822(6,  0x001);   /* Divide by 1, FS and BCLK are driven as outputs, 16K */ // NAU8822 as Master
+    //I2C_WriteNAU8822(7,  0x000);   /* 48K for internal filter coefficients */
 
     I2C_WriteNAU8822(10, 0x008);   /* DAC soft mute is disabled, DAC oversampling rate is 128x */
     I2C_WriteNAU8822(14, 0x108);   /* ADC HP filter is disabled, ADC oversampling rate is 128x */
-    I2C_WriteNAU8822(15, 0x1EF);   /* ADC left digital volume control */
-    I2C_WriteNAU8822(16, 0x1EF);   /* ADC right digital volume control */
+    I2C_WriteNAU8822(15, 0x1CF);   /* ADC left digital volume control */
+    I2C_WriteNAU8822(16, 0x1CF);   /* ADC right digital volume control */
 		
 		//I2C_WriteNAU8822(15, 0x1FF);   /* ADC left digital volume control */
     //I2C_WriteNAU8822(16, 0x1FF);   /* ADC right digital volume control */
     
-		// 11/14
-		I2C_WriteNAU8822(32, 0x1EF); 
+		//I2C_WriteNAU8822(32, 0x1EF); 
 		//I2C_WriteNAU8822(36, 0x008);
     //I2C_WriteNAU8822(37, 0x00C);
     //I2C_WriteNAU8822(38, 0x093);
@@ -277,14 +276,14 @@ void PDMA_Init1(void)
 {
 	
     /* Rx description */
-    DMA_RXDESC[0].ctl = ((BUFF_LEN*2-1)<<PDMA_DSCT_CTL_TXCNT_Pos)|PDMA_WIDTH_16|PDMA_SAR_FIX|PDMA_DAR_INC|PDMA_REQ_SINGLE|PDMA_OP_SCATTER;
+    DMA_RXDESC[0].ctl = ((BUFF_LEN-1)<<PDMA_DSCT_CTL_TXCNT_Pos)|PDMA_WIDTH_32|PDMA_SAR_FIX|PDMA_DAR_INC|PDMA_REQ_SINGLE|PDMA_OP_SCATTER;
     DMA_RXDESC[0].src = (uint32_t)&I2S0->RXFIFO;
-    DMA_RXDESC[0].dest = (uint32_t)(&audio_io_buffer1);
+    DMA_RXDESC[0].dest = (uint32_t)(&audio_io_buffer1[0]);
     DMA_RXDESC[0].offset = (uint32_t)&DMA_RXDESC[1] - (PDMA0->SCATBA);
 
-    DMA_RXDESC[1].ctl = ((BUFF_LEN*2-1)<<PDMA_DSCT_CTL_TXCNT_Pos)|PDMA_WIDTH_16|PDMA_SAR_FIX|PDMA_DAR_INC|PDMA_REQ_SINGLE|PDMA_OP_SCATTER;
+    DMA_RXDESC[1].ctl = ((BUFF_LEN-1)<<PDMA_DSCT_CTL_TXCNT_Pos)|PDMA_WIDTH_32|PDMA_SAR_FIX|PDMA_DAR_INC|PDMA_REQ_SINGLE|PDMA_OP_SCATTER;
     DMA_RXDESC[1].src = (uint32_t)&I2S0->RXFIFO;
-    DMA_RXDESC[1].dest = (uint32_t)(&audio_io_buffer1[BUFF_LEN*1]);
+    DMA_RXDESC[1].dest = (uint32_t)(&audio_io_buffer2[0]);
     DMA_RXDESC[1].offset = (uint32_t)&DMA_RXDESC[0] - (PDMA0->SCATBA);
 
     /* Open PDMA channel 1 for I2S TX and channel 2 for I2S RX */
@@ -390,25 +389,6 @@ const std::vector<std::string> outputClass_ans = {
            };						
 */
 
-void run_kws()
-{
-   
-
-    printf("Extracting features.. \r\n");
-    kws->ExtractFeatures();  // Extract MFCC features.
-
-    printf("Classifying..\r\n");
-    kws->Classify();  // Classify the extracted features.
-
-    int maxIndex = kws->GetTopClass(kws->output);
-
-    printf("Detected %s (%d%%)\r\n", outputClass[maxIndex],
-        (static_cast<int>(kws->output[maxIndex]*100)));
-}
-
-
-
-
 /*---------------------------------------------------------------------------------------------------------*/
 /*  Main Function                                                                                          */
 /*---------------------------------------------------------------------------------------------------------*/
@@ -475,9 +455,6 @@ int32_t main(void)
 
 
     printf("\nThis sample code run keyword spotting inference\n");
-		
-
-
     printf("KWS simple example; build timestamp: %s:%s\n", __DATE__, __TIME__);
 
 		// User setting for better result
@@ -488,10 +465,8 @@ int32_t main(void)
 		
 		KWS kws(recordingWin, averagingWindowLen, audio_buffer);
  
-    
 		PDMA_Init1();
     
-
     /* Enable I2S Rx function */
     I2S_ENABLE_RXDMA(I2S0);
     I2S_ENABLE_RX(I2S0);
