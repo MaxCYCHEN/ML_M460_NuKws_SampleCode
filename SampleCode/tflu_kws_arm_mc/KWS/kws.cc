@@ -74,6 +74,20 @@ void KWS::InitKws()
     predictions = std::vector<float>(slidingWindowLen * numOutClasses, 0.0);
     audioBlockSize = recordingWin * frameShift;
     audioBufferSize = audioBlockSize + frameLen - frameShift;
+		
+		/*
+        Get input and output quantization information
+    */
+    TfLiteTensor *outputTensor = model->GetOutputTensor();
+    TfLiteTensor *inputTensor = model->GetInputTensor();
+
+    /* 
+        Vww model preprocessing is image conversion from uint8 to [0,1] float values,
+        then quantize them with input quantization info.  
+    */
+    inQuantParams = GetTensorQuantParams(inputTensor);
+    outQuantParams = GetTensorQuantParams(outputTensor);
+		
 }
 
 void KWS::ExtractFeatures()
@@ -94,6 +108,31 @@ void KWS::ExtractFeatures()
 
 void KWS::Classify()
 {
+
+#ifdef INT8_MODEL	
+	  // Int8 ver. Copy mfcc features into the TfLite tensor.
+	  int8_t* inTensorData = tflite::GetTensorData<int8_t>(model->GetInputTensor());
+	  
+	  __attribute__((aligned))int8_t mfccBuffer_int8[numFrames * numMfccFeatures * sizeof(int8_t)];
+	  uint32_t ct;
+	  for(ct = 0; ct < (numFrames * numMfccFeatures); ct++){
+	      mfccBuffer_int8[ct] = static_cast<int8_t>((mfccBuffer[ct]/ inQuantParams.scale) + inQuantParams.offset);
+	  }
+		// C++ 11 transform + lambda 
+	  //std::transform(mfccBuffer.begin(), mfccBuffer.end(), mfccBuffer_int8, [this] (float x) { return static_cast<int8_t>((x/ inQuantParams.scale) + inQuantParams.offset); });
+	  memcpy(inTensorData, mfccBuffer_int8, numFrames * numMfccFeatures * sizeof(int8_t));
+		
+		// Run inference on this data.
+    model->RunInference();
+
+    // Get output from the TfLite tensor.
+    int8_t* outTensorData = tflite::GetTensorData<int8_t>(model->GetOutputTensor());
+		
+		for(ct = 0; ct < (numOutClasses); ct++){
+	      output[ct] = static_cast<float>(outQuantParams.scale*(outTensorData[ct] - outQuantParams.offset));
+	  }
+	
+#else
     // Copy mfcc features into the TfLite tensor.
     float* inTensorData = tflite::GetTensorData<float>(model->GetInputTensor());
     memcpy(inTensorData, mfccBuffer.data(), numFrames * numMfccFeatures * sizeof(float));
@@ -104,6 +143,7 @@ void KWS::Classify()
     // Get output from the TfLite tensor.
     float* outTensorData = tflite::GetTensorData<float>(model->GetOutputTensor());
     memcpy(output.data(), outTensorData, numOutClasses * sizeof(float));
+#endif			
 }
 
 int KWS::GetTopClass(const std::vector<float>& prediction)
@@ -140,4 +180,31 @@ void KWS::AveragePredictions()
         }
         averagedOutput[j] = (sum / slidingWindowLen);
     }
+}
+
+QuantParams KWS::GetTensorQuantParams(TfLiteTensor* tensor)
+{
+    QuantParams params;
+    if (kTfLiteAffineQuantization == tensor->quantization.type) 
+    {
+        auto* quantParams = (TfLiteAffineQuantization*) (tensor->quantization.params);
+        if (quantParams && 0 == quantParams->quantized_dimension) 
+        {
+            if (quantParams->scale->size) 
+            {
+                params.scale = quantParams->scale->data[0];
+            }
+            if (quantParams->zero_point->size) 
+            {
+                params.offset = quantParams->zero_point->data[0];
+            }
+        } 
+        else if (tensor->params.scale != 0.0) 
+        {
+            /* Legacy tensorflow quantisation parameters */
+            params.scale = tensor->params.scale;
+            params.offset = tensor->params.zero_point;
+        }
+    }
+    return params;
 }

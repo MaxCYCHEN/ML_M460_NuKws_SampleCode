@@ -24,6 +24,11 @@
 #include "Model.h"
 #include "mfcc.h"
 
+typedef struct {
+    float   scale;
+    int     offset;
+} QuantParams;
+
 class KWS {
 
 public:
@@ -49,6 +54,10 @@ public:
     int numOutClasses;
     int audioBlockSize;
     int audioBufferSize;
+		
+		QuantParams GetTensorQuantParams(TfLiteTensor* tensor); 
+		QuantParams inQuantParams;//To keep input quantization info
+    QuantParams outQuantParams;
 
 protected:
     /** @brief Initialises the model */

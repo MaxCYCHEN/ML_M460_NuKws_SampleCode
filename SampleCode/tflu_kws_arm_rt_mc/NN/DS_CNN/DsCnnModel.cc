@@ -62,7 +62,9 @@ const tflite::MicroOpResolver& DsCnnModel::GetOpResolver()
 
 bool DsCnnModel::EnlistOperations()
 {
+#ifndef INT8_MODEL	
     this->_opResolver.AddQuantize();
+#endif		
     this->_opResolver.AddReshape();
     this->_opResolver.AddConv2D();
     this->_opResolver.AddDepthwiseConv2D();
@@ -70,7 +72,9 @@ bool DsCnnModel::EnlistOperations()
     this->_opResolver.AddFullyConnected();
     this->_opResolver.AddRelu();
     this->_opResolver.AddSoftmax();
+#ifndef INT8_MODEL	
     this->_opResolver.AddDequantize();
+#endif		
 
     return true;
 }

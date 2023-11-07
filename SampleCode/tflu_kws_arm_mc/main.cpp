@@ -17,7 +17,7 @@ using namespace std;
 
 #include "KWS/kws.h"
 //Please update your raw keyword file to test the model.
-#include "raw/right_1.h"   
+#include "raw/four_en_0.h"   
 #include "BufAttributes.h"
 
 
@@ -31,6 +31,9 @@ KWS *kws;
 
 static volatile uint8_t s_u8TxIdx = 0, s_u8RxIdx = 0;
 static volatile uint8_t s_u8CopyData = 0;
+//volatile uint32_t g_u32Ticks = 0;
+volatile uint32_t g_u32Ticks_start = 0;
+volatile uint32_t g_u32Ticks_end = 0;
 
 void PDMA0_IRQHandler(void);
 void SYS_Init(void);
@@ -46,6 +49,16 @@ uint8_t I2C_WriteNAU88L25(uint16_t u16Addr, uint16_t u16Dat);
 void NAU88L25_Reset(void);
 void NAU88L25_Setup(void);
 #endif
+
+void monitor_timer_run(void)
+{
+    // Set timer frequency to 1HZ
+    TIMER_Open(TIMER1, TIMER_CONTINUOUS_MODE, 100);//Sets IMU default sample rate to 100Hz
+
+    // Start Timer 0
+    TIMER_Start(TIMER1);
+    
+}
 
 void PDMA0_IRQHandler(void)
 {
@@ -137,6 +150,10 @@ void SYS_Init(void)
 
     /* Enable I2C2 clock pin (PD1) schmitt trigger */
     PD->SMTEN |= GPIO_SMTEN_SMTEN1_Msk;
+		
+		/* Enable TIMER module clock */
+    CLK_EnableModuleClock(TMR1_MODULE);
+		CLK_SetModuleClock(TMR1_MODULE, CLK_CLKSEL1_TMR1SEL_LIRC, NULL);
 }
 
 
@@ -202,10 +219,11 @@ int32_t main(void)
     I2S_SET_MONO_RX_CHANNEL(I2S0, I2S_MONO_LEFT);
 #endif
 
+   monitor_timer_run();
 
    printf("\nThis sample code run keyword spotting inference\n");
 	
-	const char outputClass[12][8] = {
+/*	const char outputClass[12][8] = {
        "Silence",
        "Unknown",
        "yes",
@@ -218,7 +236,21 @@ int32_t main(void)
        "off",
        "stop",
        "go"};
-	
+	*/
+	const char outputClass[12][8] = {
+    "Silence",
+    "Unknown",
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+    "zero"
+};		 
 			 
 
    int16_t audioBuffer[] ALIGNMENT_ATTRIBUTE = WAVE_DATA;
@@ -232,11 +264,14 @@ int32_t main(void)
    KWS kws(audioBuffer, audioBufferElements);
 	//kws = new KWS(audioBuffer,audioBufferElements);		
 
+   g_u32Ticks_start = TIMER1->CNT;
    printf("Extracting features.. \r\n");
    kws.ExtractFeatures();  // Extract MFCC features.
 
    printf("Classifying..\r\n");
    kws.Classify();  // Classify the extracted features.
+   g_u32Ticks_end = TIMER1->CNT - g_u32Ticks_start;
+   printf("KWS inference time:%d\r\n", g_u32Ticks_end);
 
    int maxIndex = kws.GetTopClass(kws.output);
 
