@@ -339,7 +339,7 @@
               <MiscControls></MiscControls>
               <Define>TF_LITE_STATIC_MEMORY, ARM_MATH_CM4=1, __FPU_PRESENT=1UL</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\Library\CMSIS\Include;..\..\..\Library\Device\Nuvoton\M460\Include;..\..\..\ThirdParty;..\..\..\Library\StdDriver\inc;..\Sensor;..\ili9341;..\</IncludePath>
+              <IncludePath>..\..\..\Library\CMSIS\Include;..\..\..\Library\Device\Nuvoton\M460\Include;..\..\..\ThirdParty;..\..\..\Library\StdDriver\inc;..\Sensor;..\ili9341;..\SVM;..\</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -484,29 +484,29 @@
           <GroupName>SVM</GroupName>
           <Files>
             <File>
-              <FileName>svm.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\svm.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>svm-train.c</FileName>
+              <FileName>svm_feature.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\svm-train.c</FilePath>
+              <FilePath>..\SVM\svm_feature.c</FilePath>
             </File>
             <File>
               <FileName>svm-predict.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\svm-predict.c</FilePath>
-            </File>
-            <File>
-              <FileName>svm_feature.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\svm_feature.c</FilePath>
+              <FilePath>..\SVM\svm-predict.c</FilePath>
             </File>
             <File>
               <FileName>svm-scale.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\svm-scale.c</FilePath>
+              <FilePath>..\SVM\svm-scale.c</FilePath>
+            </File>
+            <File>
+              <FileName>svm-train.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\SVM\svm-train.c</FilePath>
+            </File>
+            <File>
+              <FileName>svm.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\SVM\svm.cpp</FilePath>
             </File>
           </Files>
         </Group>

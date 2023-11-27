@@ -395,19 +395,19 @@
 
   <Group>
     <GroupName>SVM</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>5</GroupNumber>
       <FileNumber>17</FileNumber>
-      <FileType>8</FileType>
+      <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\svm.cpp</PathWithFileName>
-      <FilenameWithoutPath>svm.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\SVM\svm_feature.c</PathWithFileName>
+      <FilenameWithoutPath>svm_feature.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -418,8 +418,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\svm-train.c</PathWithFileName>
-      <FilenameWithoutPath>svm-train.c</FilenameWithoutPath>
+      <PathWithFileName>..\SVM\svm-predict.c</PathWithFileName>
+      <FilenameWithoutPath>svm-predict.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -430,8 +430,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\svm-predict.c</PathWithFileName>
-      <FilenameWithoutPath>svm-predict.c</FilenameWithoutPath>
+      <PathWithFileName>..\SVM\svm-scale.c</PathWithFileName>
+      <FilenameWithoutPath>svm-scale.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -442,20 +442,20 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\svm_feature.c</PathWithFileName>
-      <FilenameWithoutPath>svm_feature.c</FilenameWithoutPath>
+      <PathWithFileName>..\SVM\svm-train.c</PathWithFileName>
+      <FilenameWithoutPath>svm-train.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>5</GroupNumber>
       <FileNumber>21</FileNumber>
-      <FileType>1</FileType>
+      <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\svm-scale.c</PathWithFileName>
-      <FilenameWithoutPath>svm-scale.c</FilenameWithoutPath>
+      <PathWithFileName>..\SVM\svm.cpp</PathWithFileName>
+      <FilenameWithoutPath>svm.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
