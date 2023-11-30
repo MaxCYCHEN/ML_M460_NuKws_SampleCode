@@ -514,8 +514,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\number_en_ds_cnn_int8quant.cc</PathWithFileName>
-      <FilenameWithoutPath>number_en_ds_cnn_int8quant.cc</FilenameWithoutPath>
+      <PathWithFileName>..\Generated\DS_CNN\tflu_fp32_number_en_dscn_para.cc</PathWithFileName>
+      <FilenameWithoutPath>tflu_fp32_number_en_dscn_para.cc</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
